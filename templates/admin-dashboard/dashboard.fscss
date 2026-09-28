@@ -1,6 +1,8 @@
 /* dashboard style */
     @import((*) from st-core@v2)
-    @import((*) from circle-progress)
+    @import(
+(progress-root, circle-pie-multi)
+from circle-progress)
     @import((*) from icon-mask)
 
     /* ========== TOKENS ========== */
