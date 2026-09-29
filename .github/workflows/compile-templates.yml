@@ -1,4 +1,4 @@
-# Compile FSCSS templates (admin-dashboard and future packs)
+# Compile FSCSS templates (admin-dashboard, budget-app, …)
 name: Compile templates
 
 on:
@@ -36,24 +36,30 @@ jobs:
         run: |
           fscss dashboard.fscss dashboard.css
           echo "Compiled dashboard.css ($(wc -c < dashboard.css) bytes)"
-          head -c 200 dashboard.css || true
 
-      - name: Upload compiled CSS (artifact)
+      - name: Compile budget-app
+        working-directory: templates/budget-app
+        run: |
+          fscss budget.fscss budget.css
+          echo "Compiled budget.css ($(wc -c < budget.css) bytes)"
+
+      - name: Upload compiled CSS
         uses: actions/upload-artifact@v4
         with:
-          name: admin-dashboard-css
-          path: templates/admin-dashboard/dashboard.css
+          name: template-css
+          path: |
+            templates/admin-dashboard/dashboard.css
+            templates/budget-app/budget.css
 
-      # Commit CSS back on main so Pages / hub can serve it without a local build
       - name: Commit compiled CSS
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add templates/admin-dashboard/dashboard.css
+          git add templates/admin-dashboard/dashboard.css templates/budget-app/budget.css
           if git diff --staged --quiet; then
             echo "No CSS changes to commit"
           else
-            git commit -m "chore: compile templates/admin-dashboard/dashboard.css [skip ci]"
+            git commit -m "chore: compile template CSS [skip ci]"
             git push
           fi
