@@ -2,6 +2,12 @@
 
 Mobile-style **Home + Budget** double phone UI using:
 
+---
+
+**Preview:** https://hub.devtem.org/st-core.fscss/templates/budget-app/
+[![Template Preview](/templates/budget-app/budget.jpg)](https://hub.devtem.org/st-core.fscss/templates/budget-app/)
+
+
 | Module | Role |
 |--------|------|
 | **st-core@v2** | Tokens, phone shell helpers, area/line chart (`budgetData`) |
