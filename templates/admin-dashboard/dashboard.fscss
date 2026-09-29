@@ -135,8 +135,8 @@ circle-pie-multi
       flex-shrink: 0;
     }
     .icon-btn {
-      width: 40px;
-      height: 40px;
+      %2(width, 
+      height[: 40px;])
       border-radius: 10px;
       background: var(--st-card);
       border: 1px solid var(--st-border);
@@ -148,10 +148,10 @@ circle-pie-multi
     }
     .icon-btn .badge-dot {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 8px;
-      height: 8px;
+      %4(top, 
+      right, 
+      width, 
+      height[: 8px;])
       background: #ef4444;
       border-radius: 50%;
     }
