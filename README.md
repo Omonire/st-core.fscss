@@ -18,7 +18,7 @@ Requires FSCSS **v1.2.3+**
 
 ---
 
-[![Template Preview](/templates/admin-dashboard/preview.jpg)](https://hub.devtem.org/st-core.fscss/templates/admin-dashboard/)
+[![Template Preview](/templates/budget-app/budget.jpg)](https://hub.devtem.org/st-core.fscss/templates/budget-app/)
 
 ---
 
