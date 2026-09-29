@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIGSHBudget — st-core@v2 + icon-mask</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- compiled css -->
+  <link rel="stylesheet" href="budget.css">
+</head>
+<body>
+
+  <!-- ════════════ LEFT — Home ════════════ -->
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">▮▮▮ ▮ Wi-Fi ▮</div>
+    </div>
+
+    <div class="home-header">
+      <div class="icon-btn">
+        <span class="icon icon-menu"></span>
+      </div>
+      <div class="logo">FIGSH <span>Budget</span></div>
+      <div class="icon-btn">
+        <span class="icon icon-search"></span>
+      </div>
+    </div>
+
+    <div class="balance-label">Your balance</div>
+    <div class="balance-value">$ 96,884</div>
+
+    <div class="cards-row">
+      <div class="visa-card pink">
+        <div>
+          <div class="brand">VISA</div>
+          <div class="label">Salary</div>
+        </div>
+        <div>
+          <div class="amount">$ 22,230</div>
+          <div class="digits">•• 6917</div>
+        </div>
+      </div>
+      <div class="visa-card blue">
+        <div>
+          <div class="brand">VISA</div>
+          <div class="label">Savings account</div>
+        </div>
+        <div>
+          <div class="amount">$ 51,566</div>
+          <div class="digits">•• 4552</div>
+        </div>
+      </div>
+      <div class="visa-card orange">
+        <div>
+          <div class="brand">VISA</div>
+          <div class="label">Savings</div>
+        </div>
+        <div>
+          <div class="amount">$ 23,088</div>
+          <div class="digits">•• 8821</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Finance</div>
+    <div class="finance-grid">
+      <div class="finance-item">
+        <div class="icon-wrap pink">
+          <span class="icon icon-star"></span>
+        </div>
+        <div class="name">My bonuses</div>
+      </div>
+      <div class="finance-item">
+        <div class="icon-wrap cyan">
+          <span class="icon icon-chart"></span>
+        </div>
+        <div class="name">My budget</div>
+      </div>
+      <div class="finance-item">
+        <div class="icon-wrap orange">
+          <span class="icon icon-reports"></span>
+        </div>
+        <div class="name">Finance Analysis</div>
+      </div>
+    </div>
+
+    <div class="loans-header">
+      <span>Current loans</span>
+      <span style="font-size:16px;opacity:.6">+</span>
+    </div>
+    <div class="loan-card">
+      <div class="loan-icon">
+        <span class="icon icon-inbox"></span>
+      </div>
+      <div class="loan-info">
+        <div class="title">Account № 3874825</div>
+        <div class="sub">Expires 12/22/2023</div>
+      </div>
+      <div class="loan-right">
+        <div class="amt">$ 78,92</div>
+        <div class="rate">Rate 3.5%</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <span class="icon icon-home"></span>
+        Home
+      </div>
+      <div class="nav-item">
+        <span class="icon icon-chart"></span>
+        Statistic
+      </div>
+      <div class="nav-fab">+</div>
+      <div class="nav-item">
+        <span class="icon icon-files"></span>
+        My card
+      </div>
+      <div class="nav-item">
+        <span class="icon icon-profile"></span>
+        Profile
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ════════════ RIGHT — Budget ════════════ -->
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">▮▮▮ ▮ Wi-Fi ▮</div>
+    </div>
+
+    <div class="budget-header">
+      <div class="icon-btn">
+        <span class="icon icon-logout"></span>
+      </div>
+      <div class="title">Budget</div>
+      <div class="icon-btn">
+        <span class="icon icon-filter"></span>
+      </div>
+    </div>
+
+    <div class="budget-amount">$19,345</div>
+    <div class="budget-meta">
+      <span class="forecast">September forecast $2,010</span>
+      <span>September, 2026</span>
+    </div>
+
+    <!-- Chart powered by st-core@v2 -->
+    <div class="chart-wrap">
+      <div class="chart">
+        <div class="chart-grid"></div>
+        <div class="chart-fill"></div>
+        <div class="chart-line"></div>
+        <div class="chart-dot"></div>
+        <div class="chart-tooltip">
+          − $1,345
+          <small>June 15, 2026</small>
+        </div>
+      </div>
+    </div>
+    <div class="x-axis">
+      <span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span>
+    </div>
+
+    <div class="tx-list">
+      <div class="tx-date">Sep 15, 2026</div>
+      <div class="tx-item">
+        <div class="tx-icon seo">S</div>
+        <div class="tx-info">
+          <div class="name">SEO Services</div>
+          <div class="desc">Outgoing transfer</div>
+        </div>
+        <div class="tx-amount">− $45</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon open">O</div>
+        <div class="tx-info">
+          <div class="name">Open Challenge</div>
+          <div class="desc">Monthly withdrawal of funds</div>
+        </div>
+        <div class="tx-amount">− $79</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-icon spotify">♪</div>
+        <div class="tx-info">
+          <div class="name">Spotify</div>
+          <div class="desc">Annual withdrawal of funds</div>
+        </div>
+        <div class="tx-amount">− $15</div>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+</body>
+  </html>
