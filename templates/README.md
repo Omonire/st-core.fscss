@@ -1,6 +1,16 @@
 # Templates
-
 Ready-made UI samples using **st-core@v2** and related FSCSS modules.
+
+---
+
+[![Template Preview](/templates/budget-app/budget.jpg)](/templates/budget-app/)
+
+[![Template Preview](/templates/admin-dashboard/preview.jpg)](/templates/admin-dashboard/)
+
+
+
+---
+
 
 | Template | Description |
 |----------|-------------|
