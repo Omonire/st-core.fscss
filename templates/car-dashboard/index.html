@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figsh Drive — Connected Car</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!--
+  Runtime preview (dev). Production: compile car.fscss -> car.css
+  <script src="https://cdn.jsdelivr.net/npm/fscss@1.2.4/runtime.min.js" async></script>
+  <link type="text/fscss" href="car.fscss">
+-->
+<!-- After CLI compile, prefer: -->
+<link rel="stylesheet" href="car.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6.5 17l1.2-5.2A2 2 0 0 1 9.66 10.5h4.68a2 2 0 0 1 1.96 1.3L17.5 17"/><path d="M7 17v1.5M17 17v1.5"/><circle cx="8.2" cy="14" r=".8" fill="currentColor" stroke="none"/><circle cx="15.8" cy="14" r=".8" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Figsh Drive</div>
+        <div class="brand-sub">2024 · AWD</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Main">
+      <div class="nav-label">Vehicle</div>
+      <a class="nav-item is-active" href="#dashboard" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#trips">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Trips
+      </a>
+      <a class="nav-item" href="#charging">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12z"/></svg>
+        Charging
+      </a>
+      <a class="nav-item" href="#climate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 6l16 12M20 6 4 18"/><circle cx="12" cy="12" r="3.2"/></svg>
+        Climate
+      </a>
+
+      <div class="nav-label" style="margin-top:18px">Safety</div>
+      <a class="nav-item" href="#tires">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3v5.6M12 15.4V21M3 12h5.6M15.4 12H21"/></svg>
+        Tyres
+      </a>
+      <a class="nav-item" href="#health">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1l8.8 8.8 8.8-8.8a5 5 0 0 0 0-7.1z"/></svg>
+        Health
+      </a>
+      <a class="nav-item" href="#service">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 1 5.4-5.4l-2.5 2.5"/></svg>
+        Service
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div>Firmware <b>v4.12.0</b></div>
+      <div>Last sync <b>just now</b></div>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <main class="main" id="dashboard">
+
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+
+      <div class="topbar-head">
+        <h1 class="page-title">Good evening, Alex</h1>
+        <div class="page-sub">Figsh Drive · Plate 8KX-4211 · 41,208 km</div>
+      </div>
+
+      <div class="topbar-right">
+        <span class="conn"><span class="conn-dot"></span>Live</span>
+
+        <button class="icon-btn" id="lockBtn" aria-label="Lock vehicle" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </button>
+
+        <div class="dropdown">
+          <button class="icon-btn" id="moreBtn" aria-label="More actions" aria-haspopup="menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+          </button>
+          <div class="dropdown-menu" id="moreMenu" role="menu" hidden>
+            <button class="dropdown-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+              Sync now
+            </button>
+            <button class="dropdown-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+              Settings
+            </button>
+            <button class="dropdown-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg>
+              Trip history
+            </button>
+            <button class="dropdown-item danger" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8M4.9 4.9l5.7 5.7M2 12h8M4.9 19.1l5.7-5.7M12 22v-8m7.1-9.1-5.7 5.7M22 12h-8m-5.9 7.1 5.7-5.7"/></svg>
+              Factory reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats">
+      <article class="stat-card anim">
+        <div class="stat-top">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0-8-8"/><path d="m12 12 4-3"/></svg></span>
+          <span class="stat-label">Avg speed</span>
+        </div>
+        <div class="stat-value"><span data-count="71" data-decimals="0">0</span><span class="stat-unit">km/h</span></div>
+        <div class="stat-delta up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          4.2% vs last week
+        </div>
+        <div class="stat-bar"><span style="--fill:71%"></span></div>
+      </article>
+
+      <article class="stat-card anim">
+        <div class="stat-top">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="16" height="10" rx="2.5"/><path d="M21 10v4"/><path d="M7 12h4M10 9v6"/></svg></span>
+          <span class="stat-label">Battery</span>
+        </div>
+        <div class="stat-value"><span data-count="78" data-decimals="0">0</span><span class="stat-unit">%</span></div>
+        <div class="stat-delta down">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          3% since yesterday
+        </div>
+        <div class="stat-bar"><span style="--fill:78%"></span></div>
+      </article>
+
+      <article class="stat-card anim">
+        <div class="stat-top">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12z"/></svg></span>
+          <span class="stat-label">Range left</span>
+        </div>
+        <div class="stat-value"><span data-count="342" data-decimals="0">0</span><span class="stat-unit">km</span></div>
+        <div class="stat-delta up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          18 km gained
+        </div>
+        <div class="stat-bar"><span style="--fill:64%"></span></div>
+      </article>
+
+      <article class="stat-card anim">
+        <div class="stat-top">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+          <span class="stat-label">Efficiency</span>
+        </div>
+        <div class="stat-value"><span data-count="16.4" data-decimals="1">0</span><span class="stat-unit">km/kWh</span></div>
+        <div class="stat-delta up">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          0.8 above target
+        </div>
+        <div class="stat-bar"><span style="--fill:82%"></span></div>
+      </article>
+    </section>
+
+    <section class="card chart-card anim" id="trips">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Speed trend</h2>
+          <div class="card-note">Average speed across recorded sessions</div>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Speed trend range" id="chartTabs">
+          <button class="tab" role="tab" id="tab-7d"  aria-controls="range-7d"  aria-selected="true"  tabindex="0">7D</button>
+          <button class="tab" role="tab" id="tab-30d" aria-controls="range-30d" aria-selected="false" tabindex="-1">30D</button>
+          <button class="tab" role="tab" id="tab-90d" aria-controls="range-90d" aria-selected="false" tabindex="-1">90D</button>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="range speed-7d is-active" id="range-7d" role="tabpanel" aria-labelledby="tab-7d">
+          <div class="chart-stage">
+            <div class="speed-grid-7d"></div>
+            <div class="speed-fill-7d"></div>
+            <div class="speed-line-7d"></div>
+            <div class="peak" data-peak></div>
+            <div class="axis-y" aria-hidden="true"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+          </div>
+          <div class="axis-x" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+        </div>
+
+        <div class="range speed-30d" id="range-30d" role="tabpanel" aria-labelledby="tab-30d" hidden>
+          <div class="chart-stage">
+            <div class="speed-grid-30d"></div>
+            <div class="speed-fill-30d"></div>
+            <div class="speed-line-30d"></div>
+            <div class="peak" data-peak></div>
+            <div class="axis-y" aria-hidden="true"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+          </div>
+          <div class="axis-x" aria-hidden="true"><span>1</span><span>4</span><span>7</span><span>10</span><span>13</span><span>16</span><span>19</span><span>22</span><span>25</span><span>28</span></div>
+        </div>
+
+        <div class="range speed-90d" id="range-90d" role="tabpanel" aria-labelledby="tab-90d" hidden>
+          <div class="chart-stage">
+            <div class="speed-grid-90d"></div>
+            <div class="speed-fill-90d"></div>
+            <div class="speed-line-90d"></div>
+            <div class="peak" data-peak></div>
+            <div class="axis-y" aria-hidden="true"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+          </div>
+          <div class="axis-x" aria-hidden="true"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span></div>
+        </div>
+      </div>
+
+      <p class="sr-only" id="chartDesc" aria-live="polite"></p>
+
+      <div class="chart-legend">
+        <span><i class="lg-line"></i>Average speed</span>
+        <span><i class="lg-fill"></i>Area</span>
+      </div>
+    </section>
+
+    <div class="cols-2">
+      <section class="card anim" id="tires">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Tyre pressure</h2>
+            <div class="card-note">Target 34 psi · cold</div>
+          </div>
+        </div>
+        <div class="tires">
+          <div class="tire">
+            <div class="tire-dial" style="--pct:34"><span class="tire-val">34<span class="tire-psi">psi</span></span></div>
+            <div class="tire-name">Front left</div>
+            <div class="tire-state">Normal</div>
+          </div>
+          <div class="tire is-warn">
+            <div class="tire-dial" style="--pct:28"><span class="tire-val">28<span class="tire-psi">psi</span></span></div>
+            <div class="tire-name">Front right</div>
+            <div class="tire-state">Low by 6</div>
+          </div>
+          <div class="tire">
+            <div class="tire-dial" style="--pct:35"><span class="tire-val">35<span class="tire-psi">psi</span></span></div>
+            <div class="tire-name">Rear left</div>
+            <div class="tire-state">Normal</div>
+          </div>
+          <div class="tire">
+            <div class="tire-dial" style="--pct:33"><span class="tire-val">33<span class="tire-psi">psi</span></span></div>
+            <div class="tire-name">Rear right</div>
+            <div class="tire-state">Normal</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card anim">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Efficiency by profile</h2>
+            <div class="card-note">kWh per 100 km · lower is better</div>
+          </div>
+        </div>
+        <div class="cat-list">
+          <div class="cat-row is-good">
+            <div class="cat-top"><span class="cat-name">Highway</span><span class="cat-val">15.2<small>kWh</small></span></div>
+            <div class="cat-track"><div class="cat-fill bar-highway"></div></div>
+          </div>
+          <div class="cat-row">
+            <div class="cat-top"><span class="cat-name">Mixed</span><span class="cat-val">17.9<small>kWh</small></span></div>
+            <div class="cat-track"><div class="cat-fill bar-mixed"></div></div>
+          </div>
+          <div class="cat-row is-low">
+            <div class="cat-top"><span class="cat-name">Urban</span><span class="cat-val">23.4<small>kWh</small></span></div>
+            <div class="cat-track"><div class="cat-fill bar-urban"></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="cols-2">
+      <section class="card anim">
+        <div class="card-head">
+          <h2 class="card-title">Recent trips</h2>
+        </div>
+        <div class="trips">
+          <div class="trip">
+            <span class="trip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <div class="trip-body">
+              <div class="trip-name">Home → Office</div>
+              <div class="trip-meta">Today · 08:12 · 26 min · 18.4 km/kWh</div>
+            </div>
+            <div class="trip-dist">18.4 km</div>
+          </div>
+          <div class="trip">
+            <span class="trip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+            <div class="trip-body">
+              <div class="trip-name">Grocery run</div>
+              <div class="trip-meta">Today · 18:40 · 14 min · 6.2 km</div>
+            </div>
+            <div class="trip-dist">6.2 km</div>
+          </div>
+          <div class="trip">
+            <span class="trip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12z"/></svg></span>
+            <div class="trip-body">
+              <div class="trip-name">Airport drop-off</div>
+              <div class="trip-meta">Yesterday · 06:02 · 48 min · 41.7 km</div>
+            </div>
+            <div class="trip-dist">41.7 km</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card anim" id="health">
+        <div class="card-head">
+          <h2 class="card-title">Vehicle health</h2>
+        </div>
+        <div class="alerts">
+          <div class="alert sev-bad is-unread">
+            <span class="alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <div class="alert-body">
+              <div class="alert-title">Front right tyre pressure low</div>
+              <div class="alert-text">28 psi against a 34 psi target. Check for a puncture or slow leak.</div>
+            </div>
+          </div>
+          <div class="alert sev-warn is-unread">
+            <span class="alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+            <div class="alert-body">
+              <div class="alert-title">Brake pads at 24%</div>
+              <div class="alert-text">Estimated 4,000 km of remaining range. Book a replacement soon.</div>
+            </div>
+          </div>
+          <div class="alert sev-good">
+            <span class="alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>
+            <div class="alert-body">
+              <div class="alert-title">All systems nominal</div>
+              <div class="alert-text">Battery, cooling and traction systems reporting normally.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card anim" id="climate">
+      <div class="card-head">
+        <h2 class="card-title">Climate</h2>
+        <span class="card-note">Cabin · fan low</span>
+      </div>
+      <div class="climate">
+        <div class="climate-temp"><span id="cabinTemp">22</span><sup>&deg;C</sup></div>
+
+        <div class="climate-ctl">
+          <button class="rnd" data-climate="-1" aria-label="Decrease temperature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>
+          </button>
+          <button class="rnd" data-climate="1" aria-label="Increase temperature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div class="clampills" role="group" aria-label="Climate mode">
+          <button class="pill">Eco</button>
+          <button class="pill is-on" aria-pressed="true">Comfort</button>
+          <button class="pill">Sport</button>
+        </div>
+
+        <span class="climate-spacer"></span>
+
+        <div class="seat">
+          <span>Driver heat</span>
+          <span class="seat-lvl" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card anim" id="service">
+      <div class="card-head">
+        <h2 class="card-title">Maintenance schedule</h2>
+        <span class="card-note">3 items due</span>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th class="hide-sm">Last done</th>
+            <th class="hide-sm">Interval</th>
+            <th class="num">Odometer</th>
+            <th class="num">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Oil &amp; filter change</td>
+            <td class="hide-sm">12 Mar 2026</td>
+            <td class="hide-sm">12,000 km</td>
+            <td class="num">41,208 km</td>
+            <td class="num"><span class="tag due">Due in 820 km</span></td>
+          </tr>
+          <tr>
+            <td>Brake pad replacement</td>
+            <td class="hide-sm">—</td>
+            <td class="hide-sm">40,000 km</td>
+            <td class="num">41,208 km</td>
+            <td class="num"><span class="tag over">Overdue</span></td>
+          </tr>
+          <tr>
+            <td>Tyre rotation</td>
+            <td class="hide-sm">28 Aug 2025</td>
+            <td class="hide-sm">10,000 km</td>
+            <td class="num">41,208 km</td>
+            <td class="num"><span class="tag ok">Scheduled</span></td>
+          </tr>
+          <tr>
+            <td>Cabin air filter</td>
+            <td class="hide-sm">05 Jun 2025</td>
+            <td class="hide-sm">20,000 km</td>
+            <td class="num">41,208 km</td>
+            <td class="num"><span class="tag ok">Scheduled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script src="car.js"></script>
+</body>
+</html>

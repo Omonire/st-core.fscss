@@ -1,0 +1,1176 @@
+/* ------------------------------------------------------------------
+Data
+Each range needs its own arrays: polygon stop counts are baked at
+compile time from the array length, so one shared array cannot serve
+three different point counts.
+------------------------------------------------------------------ */
+/* NOTE: no trailing semicolons on any of these. fscss emits a bare
+top-level `;` for every such statement, and Chrome discards the style
+rule that follows one - which would silently drop the :root token
+block (or the .bar-* rules). Verified in Chrome, not assumed. */
+
+/* ------------------------------------------------------------------
+Tokens
+st-core ships a purple default palette; this template is amber.
+The st-root helper must stay at the top level here. It emits its own
+root rule, so placing it inside a body rule compiles to a descendant
+selector that can never match - and every declaration written after
+that nested block gets dropped by the CSS nesting parser, taking
+colour, background and font-family with it. See README.md.
+------------------------------------------------------------------ */
+
+:root{
+/* colors */
+--st-bg: #0e0d14;
+--st-surface: #161422;
+--st-card: #1c1a2e;
+--st-accent: #9d7eff;
+--st-accent-2: #c4a8ff;
+--st-accent-dim: #3a2e6e;
+--st-green: #4fffb0;
+--st-red: #ff5e7d;
+--st-text: #e8e3ff;
+--st-muted: #6b6488;
+--st-border: rgba(157,126,255,.15);
+/* radius */
+--st-radius-xl: 40px;
+--st-radius-lg: 16px;
+--st-radius-md: 12px;
+--st-radius-sm: 10px;
+/* spacing */
+--st-pad: 24px;
+/* chart points (Y values only) */
+--st-p1: 68%;
+--st-p2: 59%;
+--st-p3: 70%;
+--st-p4: 35%;
+--st-p5: 58%;
+--st-p6: 22%;
+--st-p7: 42%;
+--st-p8: 55%;
+--st-peak-x: 71%;
+--st-peak-y: var(--st-p6);
+/* range */
+--st-cat-bar-fill-range: 0;
+/* line with */
+--st-chart-line-width: 1.5px;
+}
+
+:root{
+--st-bg: #0a0908;
+--st-surface: #131110;
+--st-card: #1a1714;
+--st-accent: #f5a524;
+--st-accent-2: #ffd166;
+--st-accent-dim: #4a3411;
+--st-green: #52d98a;
+--st-red: #ff5f56;
+--st-text: #f6efe4;
+--st-muted: #8c8073;
+--st-border: rgba(245, 165, 36, 0.14);
+--st-radius-lg: 18px;
+--st-radius-md: 13px;
+--st-radius-sm: 10px;
+--st-pad: 22px;
+--st-chart-line-width: 2px;
+/* ambient bloom used by the page frame */
+--glow-1: radial-gradient(60% 45% at 18% 0%, rgba(245, 165, 36, 0.16), transparent 70%);
+--glow-2: radial-gradient(55% 45% at 92% 12%, rgba(255, 209, 102, 0.09), transparent 72%);
+}
+body{
+background: var(--st-bg);
+color: var(--st-text);
+font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+-webkit-font-smoothing: antialiased;
+}
+*{ box-sizing: border-box; }
+body{
+min-height: 100vh;
+background-image: var(--glow-1), var(--glow-2);
+background-attachment: fixed;
+}
+::selection{ background: color-mix(in srgb, var(--st-accent) 34%, transparent); }
+*{
+scrollbar-width: thin;
+scrollbar-color: var(--st-accent-dim) transparent;
+}
+*::-webkit-scrollbar{ width: 9px; height: 9px; }
+*::-webkit-scrollbar-track{ background: transparent; }
+*::-webkit-scrollbar-thumb{
+background: var(--st-accent-dim);
+border-radius: 99px;
+border: 2px solid transparent;
+background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover{ background-color: var(--st-accent); }
+:where(a, button, [tabindex]):focus-visible{
+outline: 2px solid var(--st-accent-2);
+outline-offset: 2px;
+border-radius: var(--st-radius-sm);
+}
+/* ------------------------------------------------------------------
+Shell
+------------------------------------------------------------------ */
+.app{ display: flex; min-height: 100vh; }
+.sidebar{
+width: 248px;
+flex: 0 0 248px;
+background: color-mix(in srgb, var(--st-surface) 88%, transparent);
+backdrop-filter: blur(14px);
+border-right: 1px solid var(--st-border);
+padding: 26px 18px;
+display: flex;
+flex-direction: column;
+gap: 26px;
+position: sticky;
+top: 0;
+height: 100vh;
+z-index: 40;
+}
+.brand{ display: flex; align-items: center; gap: 11px; padding: 0 8px; }
+.brand-mark{
+width: 36px;
+height: 36px;
+border-radius: 11px;
+display: grid;
+place-items: center;
+background: linear-gradient(140deg, var(--st-accent), #b45309);
+box-shadow: 0 6px 18px rgba(245, 165, 36, 0.3);
+flex: none;
+}
+.brand-mark svg{ width: 19px; height: 19px; color: #1a1206; }
+.brand-text{ min-width: 0; }
+.brand-name{ font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+.brand-sub{ font-size: 11px; color: var(--st-muted); }
+.nav{ display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.nav-label{
+font-size: 10px;
+text-transform: uppercase;
+letter-spacing: 0.12em;
+color: var(--st-muted);
+padding: 0 10px;
+margin-bottom: 7px;
+}
+.nav-item{
+display: flex;
+align-items: center;
+gap: 11px;
+padding: 10px 11px;
+border-radius: var(--st-radius-md);
+color: var(--st-muted);
+text-decoration: none;
+font-size: 13.5px;
+font-weight: 500;
+transition: background 0.18s, color 0.18s;
+}
+.nav-item svg{ width: 17px; height: 17px; flex: none; }
+.nav-item:hover{ background: rgba(245, 165, 36, 0.07); color: var(--st-text); }
+.nav-item.is-active{
+background: color-mix(in srgb, var(--st-accent) 15%, transparent);
+color: var(--st-accent-2);
+}
+.nav-item.is-active svg{ color: var(--st-accent); }
+.sidebar-foot{
+border-top: 1px solid var(--st-border);
+padding-top: 16px;
+font-size: 11.5px;
+color: var(--st-muted);
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+.sidebar-foot b{ color: var(--st-text); font-weight: 600; }
+.scrim{
+position: fixed;
+inset: 0;
+background: rgba(0, 0, 0, 0.6);
+backdrop-filter: blur(2px);
+opacity: 0;
+visibility: hidden;
+transition: opacity 0.24s, visibility 0.24s;
+z-index: 35;
+}
+body.nav-open .scrim{ opacity: 1; visibility: visible; }
+.main{
+flex: 1;
+min-width: 0;
+padding: 24px 30px 60px;
+display: flex;
+flex-direction: column;
+gap: 18px;
+}
+/* ------------------------------------------------------------------
+Topbar
+------------------------------------------------------------------ */
+.topbar{
+display: flex;
+align-items: center;
+gap: 14px;
+padding-bottom: 4px;
+}
+.icon-btn{
+width: 38px;
+height: 38px;
+flex: none;
+display: grid;
+place-items: center;
+border-radius: var(--st-radius-md);
+border: 1px solid var(--st-border);
+background: var(--st-card);
+color: var(--st-muted);
+cursor: pointer;
+transition: color 0.18s, border-color 0.18s, background 0.18s, transform 0.18s;
+}
+.icon-btn svg{ width: 18px; height: 18px; }
+.icon-btn:hover{
+color: var(--st-accent);
+border-color: color-mix(in srgb, var(--st-accent) 40%, transparent);
+transform: translateY(-1px);
+}
+.icon-btn:active{ transform: translateY(0); }
+.icon-btn.is-on{ color: var(--st-accent); border-color: var(--st-accent); background: color-mix(in srgb, var(--st-accent) 13%, var(--st-card)); }
+.menu-btn{ display: none; }
+.topbar-head{ min-width: 0; flex: 1; }
+.page-title{ font-size: 20px; font-weight: 660; letter-spacing: -0.02em; }
+.page-sub{ font-size: 12.5px; color: var(--st-muted); margin-top: 2px; }
+.topbar-right{ display: flex; align-items: center; gap: 10px; }
+.conn{
+display: inline-flex;
+align-items: center;
+gap: 7px;
+padding: 6px 11px;
+border-radius: 99px;
+background: color-mix(in srgb, var(--st-green) 12%, transparent);
+border: 1px solid color-mix(in srgb, var(--st-green) 28%, transparent);
+color: var(--st-green);
+font-size: 11.5px;
+font-weight: 600;
+}
+.conn-dot{
+width: 6px;
+height: 6px;
+border-radius: 50%;
+background: currentColor;
+position: relative;
+}
+.conn-dot::after{
+content: "";
+position: absolute;
+inset: -3px;
+border-radius: 50%;
+border: 1px solid currentColor;
+animation: ping 2.4s ease-out infinite;
+}
+@keyframes ping{
+0%{ transform: scale(0.6); opacity: 0.85; }
+100%{ transform: scale(2.1); opacity: 0; }
+}
+/* ------------------------------------------------------------------
+Cards
+Non-interactive surfaces deliberately have no hover state - a lift
+or highlight on something that cannot be clicked reads as a broken
+affordance.
+------------------------------------------------------------------ */
+.card{
+background: var(--st-card);
+border: 1px solid var(--st-border);
+border-radius: var(--st-radius-lg);
+padding: var(--st-pad);
+position: relative;
+}
+.card-head{
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+margin-bottom: 18px;
+}
+.card-title{ font-size: 14.5px; font-weight: 620; letter-spacing: -0.01em; }
+.card-note{ font-size: 11.5px; color: var(--st-muted); }
+/* ------------------------------------------------------------------
+Stats
+------------------------------------------------------------------ */
+.stats{
+display: grid;
+grid-template-columns: repeat(4, minmax(0, 1fr));
+gap: 14px;
+}
+.stat-card{
+background: var(--st-card);
+border: 1px solid var(--st-border);
+border-radius: var(--st-radius-lg);
+padding: 17px 18px;
+display: flex;
+flex-direction: column;
+gap: 9px;
+overflow: hidden;
+position: relative;
+}
+.stat-top{ display: flex; align-items: center; gap: 8px; }
+.stat-ico{
+width: 28px;
+height: 28px;
+border-radius: 9px;
+display: grid;
+place-items: center;
+background: color-mix(in srgb, var(--st-accent) 14%, transparent);
+color: var(--st-accent);
+flex: none;
+}
+.stat-ico svg{ width: 15px; height: 15px; }
+.stat-label{ font-size: 11.5px; color: var(--st-muted); font-weight: 500; }
+.stat-value{
+font-size: 26px;
+font-weight: 680;
+letter-spacing: -0.035em;
+line-height: 1.1;
+font-variant-numeric: tabular-nums;
+}
+.stat-unit{ font-size: 13px; font-weight: 550; color: var(--st-muted); margin-left: 3px; }
+.stat-delta{
+display: inline-flex;
+align-items: center;
+gap: 4px;
+font-size: 11.5px;
+font-weight: 600;
+}
+.stat-delta.up{ color: var(--st-green); }
+.stat-delta.down{ color: var(--st-red); }
+.stat-delta svg{ width: 12px; height: 12px; }
+/* spark bar under each stat */
+.stat-bar{
+height: 3px;
+border-radius: 99px;
+background: rgba(245, 165, 36, 0.12);
+overflow: hidden;
+}
+.stat-bar span{
+display: block;
+height: 100%;
+width: var(--fill, 60%);
+border-radius: 99px;
+background: linear-gradient(90deg, var(--st-accent), var(--st-accent-2));
+}
+/* ------------------------------------------------------------------
+Chart
+------------------------------------------------------------------ */
+.tabs{
+display: inline-flex;
+gap: 2px;
+padding: 3px;
+border-radius: 99px;
+background: rgba(0, 0, 0, 0.28);
+border: 1px solid var(--st-border);
+}
+.tab{
+appearance: none;
+border: 0;
+cursor: pointer;
+font: inherit;
+font-size: 12px;
+font-weight: 600;
+color: var(--st-muted);
+background: transparent;
+padding: 6px 15px;
+border-radius: 99px;
+transition: color 0.18s, background 0.18s;
+}
+.tab:hover{ color: var(--st-text); }
+.tab[aria-selected="true"]{
+background: var(--st-accent);
+color: #1a1206;
+}
+.chart-card{ padding-bottom: 15px; }
+/* No overflow:hidden here - it clips the peak marker's halo when the
+peak lands on the first or last point (left:-7px, 2.1x scale). */
+/* Left padding reserves the y-axis gutter so labels never overlap the
+fill, which starts hard at x=0. */
+.chart-wrap{ padding: 6px 2px 0 34px; }
+.chart-stage{
+position: relative;
+height: 232px;
+}
+.range{ display: none; }
+.range.is-active{ display: block; }
+/* fill / line / grid are emitted per range further down, each scoped so
+its --st-p* resolve against its own array. */
+.peak{
+position: absolute;
+left: var(--st-peak-x, 50%);
+top: var(--st-peak-y, 50%);
+width: 11px;
+height: 11px;
+margin: -5.5px 0 0 -5.5px;
+border-radius: 50%;
+background: var(--st-accent-2);
+box-shadow: 0 0 0 3px color-mix(in srgb, var(--st-accent) 26%, transparent);
+pointer-events: none;
+z-index: 3;
+}
+/* Halo lives on a pseudo-element so it can run its own keyframes without
+fighting the dot's own animation on the same property set. */
+.peak::after{
+content: "";
+position: absolute;
+inset: -4px;
+border-radius: 50%;
+border: 1.5px solid var(--st-accent);
+animation: halo 2.6s ease-out infinite;
+}
+@keyframes halo{
+0%{ transform: scale(0.75); opacity: 0.9; }
+100%{ transform: scale(2.1); opacity: 0; }
+}
+.axis-x{
+display: flex;
+justify-content: space-between;
+margin-top: 9px;
+padding: 0 1px;
+}
+.axis-x span{
+font-size: 10.5px;
+color: var(--st-muted);
+font-variant-numeric: tabular-nums;
+flex: none;
+}
+.axis-y{
+position: absolute;
+top: 0;
+bottom: 0;
+left: -34px;
+width: 28px;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+align-items: flex-end;
+font-size: 10px;
+color: var(--st-muted);
+pointer-events: none;
+font-variant-numeric: tabular-nums;
+}
+.chart-legend{
+display: flex;
+align-items: center;
+gap: 16px;
+margin-top: 13px;
+font-size: 11.5px;
+color: var(--st-muted);
+}
+.chart-legend i{
+width: 9px;
+height: 9px;
+border-radius: 3px;
+display: inline-block;
+margin-right: 6px;
+vertical-align: -1px;
+}
+.lg-line{ background: var(--st-accent); }
+.lg-fill{ background: color-mix(in srgb, var(--st-accent) 40%, transparent); }
+/* Visually hidden but exposed to assistive tech. */
+.sr-only{
+position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0 0 0 0);
+clip-path: inset(50%);
+white-space: nowrap;
+border: 0;
+}
+/* ------------------------------------------------------------------
+Tires
+------------------------------------------------------------------ */
+.tires{
+display: grid;
+grid-template-columns: repeat(4, minmax(0, 1fr));
+gap: 14px;
+}
+.tire{ text-align: center; }
+.tire-dial{
+--pct: 0;
+--ring: var(--st-accent);
+width: 88px;
+height: 88px;
+margin: 0 auto 10px;
+border-radius: 50%;
+display: grid;
+place-items: center;
+background:
+conic-gradient(var(--ring) calc(var(--pct) * 1%), rgba(255, 255, 255, 0.06) 0);
+position: relative;
+filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+}
+/* Inner disc masks the middle so the ring reads as a gauge. */
+.tire-dial::after{
+content: "";
+position: absolute;
+inset: 8px;
+border-radius: 50%;
+background: var(--st-card);
+}
+.tire-val{
+position: relative;
+z-index: 1;
+font-size: 16px;
+font-weight: 680;
+font-variant-numeric: tabular-nums;
+}
+.tire-psi{ font-size: 10px; color: var(--st-muted); font-weight: 550; margin-left: 1px; }
+.tire-name{ font-size: 12px; font-weight: 600; }
+.tire-state{ font-size: 11px; color: var(--st-muted); margin-top: 2px; }
+.tire.is-warn .tire-dial{ --ring: var(--st-red); }
+.tire.is-warn .tire-state{ color: var(--st-red); }
+/* ------------------------------------------------------------------
+Efficiency
+------------------------------------------------------------------ */
+.cat-list{ display: flex; flex-direction: column; gap: 15px; }
+.cat-row{ display: flex; flex-direction: column; gap: 7px; }
+.cat-top{ display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.cat-name{ font-size: 12.5px; font-weight: 550; }
+.cat-val{ font-size: 12.5px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.cat-val small{ color: var(--st-muted); font-weight: 500; margin-left: 2px; }
+.cat-track{
+height: 7px;
+border-radius: 99px;
+background: rgba(255, 255, 255, 0.055);
+overflow: hidden;
+}
+.cat-fill{
+height: 100%;
+border-radius: 99px;
+background: linear-gradient(90deg, var(--st-accent), var(--st-accent-2));
+}
+.cat-row.is-low .cat-fill{ background: linear-gradient(90deg, var(--st-red), #ff9d94); }
+.cat-row.is-good .cat-fill{ background: linear-gradient(90deg, #2f9e5f, var(--st-green)); }
+/* ------------------------------------------------------------------
+Trips + health
+------------------------------------------------------------------ */
+.trips{ display: flex; flex-direction: column; }
+.trip{
+display: flex;
+align-items: center;
+gap: 13px;
+padding: 12px 4px;
+border-bottom: 1px solid var(--st-border);
+}
+.trip:last-child{ border-bottom: 0; padding-bottom: 0; }
+.trip:first-child{ padding-top: 0; }
+.trip-ico{
+width: 32px;
+height: 32px;
+flex: none;
+border-radius: 10px;
+display: grid;
+place-items: center;
+background: color-mix(in srgb, var(--st-accent) 12%, transparent);
+color: var(--st-accent);
+}
+.trip-ico svg{ width: 15px; height: 15px; }
+.trip-body{ min-width: 0; flex: 1; }
+.trip-name{ font-size: 12.5px; font-weight: 600; }
+.trip-meta{ font-size: 11px; color: var(--st-muted); margin-top: 2px; }
+.trip-dist{ font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.alerts{ display: flex; flex-direction: column; gap: 10px; }
+.alert{
+display: flex;
+align-items: flex-start;
+gap: 11px;
+padding: 12px 13px;
+border-radius: var(--st-radius-md);
+border: 1px solid var(--st-border);
+background: rgba(255, 255, 255, 0.022);
+}
+.alert-ico{
+width: 26px;
+height: 26px;
+flex: none;
+border-radius: 8px;
+display: grid;
+place-items: center;
+}
+.alert-ico svg{ width: 14px; height: 14px; }
+.alert-body{ min-width: 0; flex: 1; }
+.alert-title{ font-size: 12.5px; font-weight: 600; }
+.alert-text{ font-size: 11.5px; color: var(--st-muted); margin-top: 2px; line-height: 1.45; }
+.alert.sev-good .alert-ico{ background: color-mix(in srgb, var(--st-green) 15%, transparent); color: var(--st-green); }
+.alert.sev-warn .alert-ico{ background: color-mix(in srgb, var(--st-accent) 16%, transparent); color: var(--st-accent); }
+.alert.sev-bad .alert-ico{ background: color-mix(in srgb, var(--st-red) 15%, transparent); color: var(--st-red); }
+.alert.sev-bad{ border-color: color-mix(in srgb, var(--st-red) 26%, transparent); }
+.alert.is-unread .alert-ico{ position: relative; }
+.alert.is-unread .alert-ico::after{
+content: "";
+position: absolute;
+top: -2px;
+right: -2px;
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background: var(--st-red);
+animation: badge 2s ease-in-out infinite;
+}
+@keyframes badge{
+0%, 100%{ transform: scale(1); opacity: 1; }
+50%{ transform: scale(1.35); opacity: 0.72; }
+}
+/* ------------------------------------------------------------------
+Climate
+------------------------------------------------------------------ */
+.climate{ display: flex; align-items: center; gap: 20px; }
+.climate-temp{ font-size: 34px; font-weight: 680; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.climate-temp sup{ font-size: 15px; font-weight: 600; color: var(--st-muted); margin-left: 1px; }
+.climate-ctl{ display: flex; align-items: center; gap: 11px; }
+.rnd{
+width: 34px;
+height: 34px;
+border-radius: 50%;
+display: grid;
+place-items: center;
+border: 1px solid var(--st-border);
+background: var(--st-surface);
+color: var(--st-muted);
+cursor: pointer;
+transition: color 0.18s, border-color 0.18s, transform 0.18s;
+}
+.rnd svg{ width: 15px; height: 15px; }
+.rnd:hover{ color: var(--st-accent); border-color: color-mix(in srgb, var(--st-accent) 40%, transparent); }
+.rnd:active{ transform: scale(0.93); }
+.rnd.is-on{ color: var(--st-accent); border-color: color-mix(in srgb, var(--st-accent) 45%, transparent); }
+.clampills{ display: flex; gap: 7px; }
+.pill{
+appearance: none;
+font: inherit;
+font-size: 11.5px;
+font-weight: 600;
+cursor: pointer;
+padding: 6px 13px;
+border-radius: 99px;
+border: 1px solid var(--st-border);
+background: var(--st-surface);
+color: var(--st-muted);
+transition: color 0.18s, background 0.18s, border-color 0.18s;
+}
+.pill:hover{ color: var(--st-text); }
+.pill.is-on{
+background: color-mix(in srgb, var(--st-accent) 17%, transparent);
+border-color: color-mix(in srgb, var(--st-accent) 42%, transparent);
+color: var(--st-accent-2);
+}
+.climate-spacer{ flex: 1; }
+.seat{ display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--st-muted); }
+.seat-lvl{ display: flex; gap: 3px; }
+.seat-lvl i{
+width: 6px;
+height: 16px;
+border-radius: 2px;
+background: rgba(255, 255, 255, 0.1);
+}
+.seat-lvl i.on{ background: var(--st-accent); }
+/* ------------------------------------------------------------------
+Maintenance
+------------------------------------------------------------------ */
+.tbl{ width: 100%; border-collapse: collapse; }
+.tbl th{
+text-align: left;
+font-size: 10.5px;
+text-transform: uppercase;
+letter-spacing: 0.09em;
+color: var(--st-muted);
+font-weight: 600;
+padding: 0 12px 11px 0;
+border-bottom: 1px solid var(--st-border);
+}
+.tbl td{
+padding: 13px 12px 13px 0;
+border-bottom: 1px solid var(--st-border);
+font-size: 12.5px;
+}
+.tbl tbody tr{ transition: background 0.15s; cursor: pointer; }
+/* Uniform hover on every row, including the last - excluding the last
+row reads as a rendering bug rather than a design choice. */
+.tbl tbody tr:hover{ background: rgba(245, 165, 36, 0.055); }
+.tbl tbody tr:last-child td{ border-bottom: 0; }
+.tbl tbody tr:last-child:hover{ background: rgba(245, 165, 36, 0.055); }
+.tbl .num{ text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.tag{
+display: inline-block;
+font-size: 10.5px;
+font-weight: 650;
+padding: 3px 9px;
+border-radius: 99px;
+white-space: nowrap;
+}
+.tag.ok{ background: color-mix(in srgb, var(--st-green) 14%, transparent); color: var(--st-green); }
+.tag.due{ background: color-mix(in srgb, var(--st-accent) 16%, transparent); color: var(--st-accent); }
+.tag.over{ background: color-mix(in srgb, var(--st-red) 14%, transparent); color: var(--st-red); }
+/* ------------------------------------------------------------------
+Dropdown
+------------------------------------------------------------------ */
+.dropdown{ position: relative; }
+.dropdown-menu{
+position: absolute;
+top: calc(100% + 8px);
+right: 0;
+min-width: 190px;
+background: var(--st-surface);
+border: 1px solid var(--st-border);
+border-radius: var(--st-radius-md);
+box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+padding: 6px;
+z-index: 60;
+/* backwards, not both: `both` pins opacity:0 before the open delay
+elapses, which leaves the panel visible during that gap. */
+animation: drop 0.16s ease-out backwards;
+}
+@keyframes drop{
+from{ opacity: 0; transform: translateY(-5px); }
+to{ opacity: 1; transform: translateY(0); }
+}
+.dropdown-item{
+display: flex;
+align-items: center;
+gap: 9px;
+width: 100%;
+text-align: left;
+font: inherit;
+font-size: 12.5px;
+appearance: none;
+border: 0;
+cursor: pointer;
+background: transparent;
+color: var(--st-text);
+padding: 8px 10px;
+border-radius: var(--st-radius-sm);
+transition: background 0.15s;
+}
+.dropdown-item:hover{ background: rgba(245, 165, 36, 0.09); }
+.dropdown-item svg{ width: 15px; height: 15px; color: var(--st-muted); flex: none; }
+.dropdown-item.danger{ color: var(--st-red); }
+.dropdown-item.danger svg{ color: var(--st-red); }
+/* ------------------------------------------------------------------
+Layout grids
+------------------------------------------------------------------ */
+.cols-2{
+display: grid;
+grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+gap: 18px;
+align-items: start;
+}
+/* ------------------------------------------------------------------
+Entrance animation
+`backwards` (not `both`) so the element is visible once the
+animation completes - `both` pins the final keyframe forever.
+------------------------------------------------------------------ */
+.anim{
+animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.anim:nth-child(1){ animation-delay: 0.02s; }
+.anim:nth-child(2){ animation-delay: 0.07s; }
+.anim:nth-child(3){ animation-delay: 0.12s; }
+.anim:nth-child(4){ animation-delay: 0.17s; }
+.anim:nth-child(5){ animation-delay: 0.22s; }
+.anim:nth-child(6){ animation-delay: 0.27s; }
+.anim:nth-child(7){ animation-delay: 0.32s; }
+.anim:nth-child(8){ animation-delay: 0.37s; }
+@keyframes rise{
+from{ opacity: 0; transform: translateY(11px); }
+to{ opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){
+*, *::before, *::after{
+animation-duration: 0.001ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: 0.001ms !important;
+}
+}
+/* ------------------------------------------------------------------
+Responsive
+------------------------------------------------------------------ */
+@media (max-width: 1180px){
+.menu-btn{ display: grid; }
+.sidebar{
+position: fixed;
+top: 0;
+left: 0;
+height: 100vh;
+transform: translateX(-100%);
+transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+box-shadow: 24px 0 60px rgba(0, 0, 0, 0.55);
+}
+body.nav-open .sidebar{ transform: translateX(0); }
+.main{ padding: 20px 20px 50px; }
+}
+@media (max-width: 900px){
+.stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols-2{ grid-template-columns: minmax(0, 1fr); }
+.tires{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; }
+}
+@media (max-width: 620px){
+.main{ padding: 16px 14px 40px; }
+.stats{ grid-template-columns: minmax(0, 1fr); }
+.climate{ flex-wrap: wrap; gap: 15px; }
+.climate-spacer{ display: none; }
+.page-title{ font-size: 18px; }
+.stat-value{ font-size: 23px; }
+.card{ padding: 17px; }
+.tbl .hide-sm{ display: none; }
+.axis-y{ display: none; }
+}
+/* ------------------------------------------------------------------
+Per-range chart geometry
+Stops are baked at compile time, so each range needs its own
+fill / line / grid and cannot share an array. Points are written onto
+the range container so the chart point custom properties resolve
+against the right array and the three ranges never overwrite each
+other. The chart-points helper takes no selector argument - it must
+be called from inside a rule or its declarations have nowhere to land.
+------------------------------------------------------------------ */
+.speed-7d{
+
+/* preserve */--st-p1: 38%;
+--st-p2: 29%;
+--st-p3: 45%;
+--st-p4: 16%;
+--st-p5: 10%;
+--st-p6: 27%;
+--st-p7: 32%;
+
+.speed-fill-7d{
+position: absolute;
+inset: 0;
+/* Build index array from the same data array that was passed to st-chart-points */
+
+clip-path: polygon(
+0% var(--st-p1),
+16.666666666666668% var(--st-p2),
+33.333333333333336% var(--st-p3),
+50% var(--st-p4),
+66.66666666666667% var(--st-p5),
+83.33333333333333% var(--st-p6),
+100% var(--st-p7),
+100% 100%,
+0% 100%
+);
+background: linear-gradient(
+180deg,
+color-mix(in srgb, var(--st-accent) 35%, transparent),
+transparent
+);
+}
+
+.speed-line-7d{
+position: absolute;
+inset: 0;
+
+clip-path: polygon(
+/* top edge (the visible stroke) */
+0% var(--st-p1),
+16.666666666666668% var(--st-p2),
+33.333333333333336% var(--st-p3),
+50% var(--st-p4),
+66.66666666666667% var(--st-p5),
+83.33333333333333% var(--st-p6),
+100% var(--st-p7),
+
+100%
+calc(var(--st-p7) + var(--st-chart-line-width)),
+83.33333333333333%
+calc(var(--st-p6) + var(--st-chart-line-width)),
+66.66666666666667%
+calc(var(--st-p5) + var(--st-chart-line-width)),
+50%
+calc(var(--st-p4) + var(--st-chart-line-width)),
+33.333333333333336%
+calc(var(--st-p3) + var(--st-chart-line-width)),
+16.666666666666668%
+calc(var(--st-p2) + var(--st-chart-line-width)),
+0%
+calc(var(--st-p1) + var(--st-chart-line-width)),
+
+-100% calc(var(--st-p1) + var(--st-chart-line-width)) );
+background: var(--st-accent);
+}
+
+.speed-grid-7d{
+position: absolute;
+width: 100%;
+height: 100%;
+background: repeating-linear-gradient(
+to bottom,
+var(--st-muted) 0,
+var(--st-muted) 1px,
+transparent 1px,
+transparent calc(100% / 5)
+), repeating-linear-gradient(
+to right,
+var(--st-accent) 0,
+var(--st-accent) 1px,
+transparent 1px,
+transparent calc(100% / 7)
+);
+opacity:.2;
+}
+}
+.speed-30d{
+
+/* preserve */--st-p1: 52%;
+--st-p2: 45%;
+--st-p3: 48%;
+--st-p4: 39%;
+--st-p5: 42%;
+--st-p6: 33%;
+--st-p7: 28%;
+--st-p8: 31%;
+--st-p9: 25%;
+--st-p10: 29%;
+
+.speed-fill-30d{
+position: absolute;
+inset: 0;
+/* Build index array from the same data array that was passed to st-chart-points */
+
+clip-path: polygon(
+0% var(--st-p1),
+11.11111111111111% var(--st-p2),
+22.22222222222222% var(--st-p3),
+33.333333333333336% var(--st-p4),
+44.44444444444444% var(--st-p5),
+55.55555555555556% var(--st-p6),
+66.66666666666667% var(--st-p7),
+77.77777777777777% var(--st-p8),
+88.88888888888889% var(--st-p9),
+100% var(--st-p10),
+100% 100%,
+0% 100%
+);
+background: linear-gradient(
+180deg,
+color-mix(in srgb, var(--st-accent) 35%, transparent),
+transparent
+);
+}
+
+.speed-line-30d{
+position: absolute;
+inset: 0;
+
+clip-path: polygon(
+/* top edge (the visible stroke) */
+0% var(--st-p1),
+11.11111111111111% var(--st-p2),
+22.22222222222222% var(--st-p3),
+33.333333333333336% var(--st-p4),
+44.44444444444444% var(--st-p5),
+55.55555555555556% var(--st-p6),
+66.66666666666667% var(--st-p7),
+77.77777777777777% var(--st-p8),
+88.88888888888889% var(--st-p9),
+100% var(--st-p10),
+
+100%
+calc(var(--st-p10) + var(--st-chart-line-width)),
+88.88888888888889%
+calc(var(--st-p9) + var(--st-chart-line-width)),
+77.77777777777777%
+calc(var(--st-p8) + var(--st-chart-line-width)),
+66.66666666666667%
+calc(var(--st-p7) + var(--st-chart-line-width)),
+55.55555555555556%
+calc(var(--st-p6) + var(--st-chart-line-width)),
+44.44444444444444%
+calc(var(--st-p5) + var(--st-chart-line-width)),
+33.333333333333336%
+calc(var(--st-p4) + var(--st-chart-line-width)),
+22.22222222222222%
+calc(var(--st-p3) + var(--st-chart-line-width)),
+11.11111111111111%
+calc(var(--st-p2) + var(--st-chart-line-width)),
+0%
+calc(var(--st-p1) + var(--st-chart-line-width)),
+
+-100% calc(var(--st-p1) + var(--st-chart-line-width)) );
+background: var(--st-accent);
+}
+
+.speed-grid-30d{
+position: absolute;
+width: 100%;
+height: 100%;
+background: repeating-linear-gradient(
+to bottom,
+var(--st-muted) 0,
+var(--st-muted) 1px,
+transparent 1px,
+transparent calc(100% / 5)
+), repeating-linear-gradient(
+to right,
+var(--st-accent) 0,
+var(--st-accent) 1px,
+transparent 1px,
+transparent calc(100% / 10)
+);
+opacity:.2;
+}
+}
+.speed-90d{
+
+/* preserve */--st-p1: 34%;
+--st-p2: 29%;
+--st-p3: 36%;
+--st-p4: 23%;
+--st-p5: 31%;
+--st-p6: 42%;
+--st-p7: 37%;
+--st-p8: 26%;
+--st-p9: 19%;
+--st-p10: 24%;
+--st-p11: 30%;
+--st-p12: 35%;
+
+.speed-fill-90d{
+position: absolute;
+inset: 0;
+/* Build index array from the same data array that was passed to st-chart-points */
+
+clip-path: polygon(
+0% var(--st-p1),
+9.090909090909092% var(--st-p2),
+18.181818181818183% var(--st-p3),
+27.272727272727273% var(--st-p4),
+36.36363636363637% var(--st-p5),
+45.45454545454545% var(--st-p6),
+54.54545454545455% var(--st-p7),
+63.63636363636363% var(--st-p8),
+72.72727272727273% var(--st-p9),
+81.81818181818181% var(--st-p10),
+90.9090909090909% var(--st-p11),
+100% var(--st-p12),
+100% 100%,
+0% 100%
+);
+background: linear-gradient(
+180deg,
+color-mix(in srgb, var(--st-accent) 35%, transparent),
+transparent
+);
+}
+
+.speed-line-90d{
+position: absolute;
+inset: 0;
+
+clip-path: polygon(
+/* top edge (the visible stroke) */
+0% var(--st-p1),
+9.090909090909092% var(--st-p2),
+18.181818181818183% var(--st-p3),
+27.272727272727273% var(--st-p4),
+36.36363636363637% var(--st-p5),
+45.45454545454545% var(--st-p6),
+54.54545454545455% var(--st-p7),
+63.63636363636363% var(--st-p8),
+72.72727272727273% var(--st-p9),
+81.81818181818181% var(--st-p10),
+90.9090909090909% var(--st-p11),
+100% var(--st-p12),
+
+100%
+calc(var(--st-p12) + var(--st-chart-line-width)),
+90.9090909090909%
+calc(var(--st-p11) + var(--st-chart-line-width)),
+81.81818181818181%
+calc(var(--st-p10) + var(--st-chart-line-width)),
+72.72727272727273%
+calc(var(--st-p9) + var(--st-chart-line-width)),
+63.63636363636363%
+calc(var(--st-p8) + var(--st-chart-line-width)),
+54.54545454545455%
+calc(var(--st-p7) + var(--st-chart-line-width)),
+45.45454545454545%
+calc(var(--st-p6) + var(--st-chart-line-width)),
+36.36363636363637%
+calc(var(--st-p5) + var(--st-chart-line-width)),
+27.272727272727273%
+calc(var(--st-p4) + var(--st-chart-line-width)),
+18.181818181818183%
+calc(var(--st-p3) + var(--st-chart-line-width)),
+9.090909090909092%
+calc(var(--st-p2) + var(--st-chart-line-width)),
+0%
+calc(var(--st-p1) + var(--st-chart-line-width)),
+
+-100% calc(var(--st-p1) + var(--st-chart-line-width)) );
+background: var(--st-accent);
+}
+
+.speed-grid-90d{
+position: absolute;
+width: 100%;
+height: 100%;
+background: repeating-linear-gradient(
+to bottom,
+var(--st-muted) 0,
+var(--st-muted) 1px,
+transparent 1px,
+transparent calc(100% / 5)
+), repeating-linear-gradient(
+to right,
+var(--st-accent) 0,
+var(--st-accent) 1px,
+transparent 1px,
+transparent calc(100% / 12)
+);
+opacity:.2;
+}
+}
+/* The cat-bar helper takes the target selector as its first argument and
+emits a COMPLETE rule for it (range value, height, width, radius).
+Two traps, both verified against Chrome rather than assumed:
+1. Calling it from inside an extra wrapper rule nests that rule in a
+second copy of the same selector, producing a descendant selector
+that never matches - the bars render widthless.
+2. Leaving a trailing semicolon on a BARE top-level call makes
+fscss emit a stray semicolon between rules. Chrome discards the
+style rule that follows one, so only the first bar survived and
+the rest silently rendered at full width.
+So: call it bare, and do not terminate it. */
+
+.bar-urban{
+--st-cat-bar-fill-range: 68%;
+height: 100%;
+width: var(--st-cat-bar-fill-range);
+border-radius: 999px;
+background: linear-gradient(
+90deg,
+var(--st-accent),
+var(--st-accent-2)
+);
+transform-origin: left;
+}
+
+.bar-highway{
+--st-cat-bar-fill-range: 84%;
+height: 100%;
+width: var(--st-cat-bar-fill-range);
+border-radius: 999px;
+background: linear-gradient(
+90deg,
+var(--st-accent),
+var(--st-accent-2)
+);
+transform-origin: left;
+}
+
+.bar-mixed{
+--st-cat-bar-fill-range: 76%;
+height: 100%;
+width: var(--st-cat-bar-fill-range);
+border-radius: 999px;
+background: linear-gradient(
+90deg,
+var(--st-accent),
+var(--st-accent-2)
+);
+transform-origin: left;
+}

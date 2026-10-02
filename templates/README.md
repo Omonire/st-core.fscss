@@ -7,6 +7,8 @@ Ready-made UI samples using **st-core@v2** and related FSCSS modules.
 
 [![Template Preview](/templates/admin-dashboard/preview.jpg)](/templates/admin-dashboard/)
 
+[![Template Preview](/templates/car-dashboard/car.jpg)](/templates/car-dashboard/)
+
 
 
 ---
@@ -15,6 +17,7 @@ Ready-made UI samples using **st-core@v2** and related FSCSS modules.
 | Template | Description |
 |----------|-------------|
 | [admin-dashboard](./admin-dashboard/) | Analytics shell: chart, pie, goals, lists, table |
+| [car-dashboard](./car-dashboard/) | Connected car: 3-range speed chart, tire dials, efficiency bars, trips, health, climate, maintenance |
 
 Add React/Next variants later; start from the HTML split (`*.fscss` / `*.css` / `*.js`).
 
