@@ -829,6 +829,7 @@ body.nav-open .scrim{ opacity: 1; visibility: visible; }
   cursor: pointer;
   background: transparent;
   color: var(--st-text);
+  text-decoration: none;
   padding: 8px 10px;
   border-radius: var(--st-radius-sm);
   transition: background 0.15s;
